@@ -1,0 +1,1631 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="2014—2026 加密被盗事件看板：三栏信息流、频道筛选、概览矩阵与规模榜。">
+<title>加密被盗事件看板 · 2014—2026</title>
+<style>
+  :root{
+    --bg:#f6f7f9;
+    --panel:#ffffff;
+    --line:#e8eaed;
+    --line-soft:#f0f1f3;
+    --ink:#1f2329;
+    --ink-2:#3f4650;
+    --muted:#8a919c;
+    --muted-2:#a5abb4;
+    --blue:#2563eb;
+    --blue-soft:#eff5ff;
+    --blue-line:#dbe7fe;
+    --green:#0f7a4d;
+    --green-soft:#e9f7ef;
+    --green-line:#cfeddd;
+    --amber:#9a5b00;
+    --amber-soft:#fff7e8;
+    --amber-line:#f3e2bd;
+    --red:#b3261e;
+    --red-soft:#fdeeed;
+    --red-line:#f6d4d1;
+    --purple:#6d28d9;
+    --purple-soft:#f3efff;
+    --purple-line:#e4dbfd;
+    --radius:14px;
+    --shadow:0 1px 2px rgba(16,24,40,.03);
+    --font:"Inter","Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+  }
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--font);
+    font-size:13px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+  a{color:inherit}
+  button{font:inherit;color:inherit}
+  ::selection{background:#dbeafe;color:var(--ink)}
+
+  .app{
+    display:grid;
+    grid-template-columns:236px minmax(0,1fr) 336px;
+    gap:14px;
+    align-items:start;
+    max-width:1440px;
+    margin:0 auto;
+    padding:16px;
+  }
+
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+  }
+
+  svg.ic{width:13px;height:13px;display:block;flex:0 0 auto}
+
+  /* ---------- Left rail ---------- */
+  .rail-left{position:sticky;top:16px}
+
+  .channel-panel{padding:14px 12px 12px}
+
+  .side-head{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:10px;
+    padding:0 6px 10px;
+  }
+
+  .side-head h2{
+    margin:0;
+    font-size:14px;
+    font-weight:600;
+    letter-spacing:-.01em;
+  }
+
+  .side-head span{font-size:10.5px;color:var(--muted);white-space:nowrap}
+
+  .channel-nav{display:grid;gap:2px}
+
+  .group-label{
+    margin:12px 6px 4px;
+    font-size:10px;
+    font-weight:600;
+    letter-spacing:.09em;
+    text-transform:uppercase;
+    color:var(--muted-2);
+  }
+
+  .channel{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    width:100%;
+    min-height:36px;
+    padding:6px 8px;
+    border:0;
+    border-radius:8px;
+    background:transparent;
+    text-align:left;
+    font-size:12.5px;
+    color:var(--ink-2);
+    cursor:pointer;
+    transition:background .15s ease,color .15s ease;
+  }
+
+  .channel:hover{background:#f8f9fa}
+  .channel.is-active{background:#f0f2f4;color:var(--ink);font-weight:600}
+  .channel:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+
+  .ch-ic{
+    width:20px;
+    height:20px;
+    border-radius:6px;
+    display:grid;
+    place-items:center;
+    background:#f1f2f4;
+    color:#6b7280;
+    flex:0 0 auto;
+  }
+  .ch-ic svg{width:12px;height:12px}
+
+  .ch-ic.blue{background:var(--blue-soft);color:var(--blue)}
+  .ch-ic.purple{background:var(--purple-soft);color:var(--purple)}
+  .ch-ic.green{background:var(--green-soft);color:var(--green)}
+  .ch-ic.amber{background:var(--amber-soft);color:var(--amber)}
+  .ch-ic.red{background:var(--red-soft);color:var(--red)}
+  .ch-ic.slate{background:#f2f4f7;color:#5b6472}
+
+  .ch-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .ch-count{
+    margin-left:auto;
+    color:var(--muted);
+    font-size:10.5px;
+    font-variant-numeric:tabular-nums;
+    font-weight:400;
+  }
+
+  .side-foot{
+    margin-top:12px;
+    padding:10px 6px 2px;
+    border-top:1px solid var(--line-soft);
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:10.5px;
+    color:var(--muted);
+  }
+
+  .side-foot i{
+    width:5px;
+    height:5px;
+    border-radius:50%;
+    background:var(--green);
+    flex:0 0 auto;
+  }
+
+  /* ---------- Center feed ---------- */
+  .feed{overflow:hidden}
+
+  .feed-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:16px 20px 12px;
+  }
+
+  .feed-title-wrap{display:flex;align-items:center;gap:10px;min-width:0}
+
+  .feed-title{
+    margin:0;
+    font-size:20px;
+    line-height:1.25;
+    letter-spacing:-.02em;
+    font-weight:600;
+    white-space:nowrap;
+  }
+
+  .verify-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    height:24px;
+    padding:0 9px;
+    border:1px solid var(--blue-line);
+    border-radius:999px;
+    background:var(--blue-soft);
+    color:var(--blue);
+    font-size:10.5px;
+    font-weight:500;
+    white-space:nowrap;
+  }
+
+  .verify-pill i{width:5px;height:5px;border-radius:50%;background:var(--blue)}
+
+  .feed-actions{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+
+  .icon-btn{
+    width:30px;
+    height:30px;
+    display:grid;
+    place-items:center;
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:#fff;
+    color:#6b7280;
+    cursor:pointer;
+    transition:background .15s ease,color .15s ease;
+  }
+
+  .icon-btn:hover{background:#f8f9fa;color:var(--ink)}
+  .icon-btn:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+  .icon-btn svg{width:14px;height:14px}
+
+  .feed-tools{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    flex-wrap:wrap;
+    padding:9px 20px 11px;
+    border-top:1px solid var(--line-soft);
+    border-bottom:1px solid var(--line);
+  }
+
+  .source-pick{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    font-size:11.5px;
+    color:var(--muted);
+  }
+
+  .select-wrap{position:relative;display:inline-flex;align-items:center}
+
+  .select-wrap select{
+    appearance:none;
+    height:30px;
+    min-width:104px;
+    padding:0 26px 0 10px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:#fff;
+    color:var(--ink-2);
+    font:inherit;
+    font-size:11.5px;
+    cursor:pointer;
+  }
+
+  .select-wrap select:hover{border-color:#d5d8dd}
+  .select-wrap select:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+
+  .select-wrap svg{
+    position:absolute;
+    right:8px;
+    width:10px;
+    height:10px;
+    color:var(--muted);
+    pointer-events:none;
+  }
+
+  .feed-meta{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    font-size:10.5px;
+    color:var(--muted);
+    white-space:nowrap;
+    font-variant-numeric:tabular-nums;
+  }
+
+  .feed-meta .sep{color:#d2d6dc}
+
+  .feed-body{padding-bottom:4px}
+
+  .year-group.is-hidden{display:none}
+
+  .year-head{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:11px 20px;
+    border-bottom:1px solid var(--line-soft);
+    background:#fcfcfd;
+  }
+
+  .year-head strong{
+    font-size:13.5px;
+    font-weight:600;
+    letter-spacing:-.01em;
+  }
+
+  .year-head .year-note{font-size:10.5px;color:var(--muted)}
+  .year-head .year-count{
+    margin-left:auto;
+    font-size:10.5px;
+    color:var(--muted);
+    font-variant-numeric:tabular-nums;
+  }
+
+  .feed-item{
+    display:grid;
+    grid-template-columns:70px minmax(0,1fr);
+    gap:12px;
+    padding:13px 20px 14px;
+    border-bottom:1px solid var(--line-soft);
+    transition:background .15s ease;
+  }
+
+  .feed-item:last-child{border-bottom:0}
+  .feed-item:hover{background:#fbfcfd}
+  .feed-item.is-hidden{display:none}
+  .feed-item.is-flash{background:#fff8e6;transition:background .3s ease}
+
+  .feed-time{
+    padding-top:2px;
+    font-size:10.5px;
+    line-height:1.45;
+    color:var(--muted);
+    font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+  }
+  .feed-time time{display:block}
+
+  .item-head{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    flex-wrap:wrap;
+    margin-bottom:6px;
+  }
+
+  .type-tag{
+    display:inline-flex;
+    align-items:center;
+    height:18px;
+    padding:0 6px;
+    border-radius:4px;
+    border:1px solid var(--blue-line);
+    background:var(--blue-soft);
+    color:var(--blue);
+    font-size:10px;
+    font-weight:500;
+    white-space:nowrap;
+  }
+
+  .type-tag.cold{
+    border-color:var(--purple-line);
+    background:var(--purple-soft);
+    color:var(--purple);
+  }
+
+  .avatar{
+    width:22px;
+    height:22px;
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    background:var(--blue-soft);
+    color:var(--blue);
+    font-size:10px;
+    font-weight:600;
+    flex:0 0 auto;
+  }
+
+  .avatar.cold{background:var(--purple-soft);color:var(--purple)}
+
+  .item-title{
+    margin:0;
+    font-size:14px;
+    line-height:1.4;
+    font-weight:600;
+    letter-spacing:-.01em;
+    color:var(--ink);
+  }
+
+  .record-tag{
+    display:inline-block;
+    margin-left:4px;
+    padding:1px 5px;
+    border-radius:4px;
+    background:var(--red-soft);
+    color:var(--red);
+    font-size:9.5px;
+    font-weight:600;
+    vertical-align:1px;
+    white-space:nowrap;
+  }
+
+  .status{
+    margin-left:auto;
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    height:19px;
+    padding:0 6px;
+    border-radius:4px;
+    border:1px solid transparent;
+    font-size:10px;
+    font-weight:500;
+    white-space:nowrap;
+  }
+
+  .status::before{content:"";width:4px;height:4px;border-radius:50%;background:currentColor}
+  .status.full{background:var(--green-soft);border-color:var(--green-line);color:var(--green)}
+  .status.partial{background:var(--amber-soft);border-color:var(--amber-line);color:var(--amber)}
+  .status.none{background:var(--red-soft);border-color:var(--red-line);color:var(--red)}
+
+  .feed-lines{display:grid;gap:3px}
+
+  .line{
+    display:grid;
+    grid-template-columns:32px minmax(0,1fr);
+    gap:8px;
+    margin:0;
+    font-size:12px;
+    line-height:1.62;
+    color:var(--ink-2);
+  }
+
+  .line .k{
+    color:var(--muted-2);
+    font-size:10.5px;
+    line-height:1.85;
+    white-space:nowrap;
+  }
+
+  .line .v{min-width:0}
+  .line strong{font-weight:600;color:var(--ink)}
+  .line .muted{color:var(--muted)}
+
+  .feed-item[data-status="full"] .line.result .k{color:var(--green)}
+  .feed-item[data-status="partial"] .line.result .k{color:var(--amber)}
+  .feed-item[data-status="none"] .line.result .k{color:var(--red)}
+
+  .item-foot{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    margin-top:5px;
+  }
+
+  .src{
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    font-size:10.5px;
+    color:var(--blue);
+    text-decoration:none;
+    border-bottom:1px solid transparent;
+  }
+
+  .src:hover{border-bottom-color:var(--blue)}
+  .src:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+  .src svg{width:9px;height:9px}
+
+  .empty{
+    padding:56px 20px;
+    text-align:center;
+    color:var(--muted);
+  }
+
+  .empty strong{display:block;font-size:13px;color:var(--ink-2);font-weight:600;margin-bottom:4px}
+
+  /* ---------- Right rail ---------- */
+  .rail-right{display:grid;gap:14px}
+
+  .summary,.ranking{padding:14px 16px 12px}
+
+  .panel-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:12px;
+  }
+
+  .panel-head h2{
+    margin:0;
+    font-size:13px;
+    font-weight:600;
+    letter-spacing:-.01em;
+    white-space:nowrap;
+  }
+
+  .panel-link{
+    font-size:10.5px;
+    color:var(--muted);
+    text-decoration:none;
+    white-space:nowrap;
+  }
+
+  .panel-link:hover{color:var(--ink-2)}
+
+  .market-stats{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin-bottom:12px;
+  }
+
+  .market-stat{min-width:0}
+
+  .market-stat .k{
+    display:block;
+    font-size:10px;
+    color:var(--muted);
+    margin-bottom:2px;
+    white-space:nowrap;
+  }
+
+  .market-stat strong{
+    display:block;
+    font-size:15px;
+    line-height:1.3;
+    font-weight:600;
+    letter-spacing:-.01em;
+    font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+  }
+
+  .market-stat strong em{
+    font-style:normal;
+    font-size:10px;
+    font-weight:500;
+    color:var(--green);
+    margin-left:4px;
+    vertical-align:1px;
+  }
+
+  .market-stat small{display:block;font-size:9.5px;color:var(--muted);margin-top:1px}
+
+  .mosaic{
+    display:grid;
+    grid-template-columns:1.38fr .8fr .8fr;
+    grid-auto-rows:54px;
+    gap:4px;
+  }
+
+  .tile{
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    justify-content:center;
+    padding:7px 9px;
+    border-radius:7px;
+    background:#f4f5f7;
+    color:var(--ink);
+    min-width:0;
+    overflow:hidden;
+  }
+
+  .tile .t-k{
+    font-size:9.5px;
+    color:#687180;
+    white-space:nowrap;
+    line-height:1.3;
+  }
+
+  .tile strong{
+    font-size:15px;
+    line-height:1.25;
+    font-weight:600;
+    font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+  }
+
+  .tile strong small{font-size:9.5px;font-weight:500;margin-left:1px;color:inherit;opacity:.72}
+
+  .tile.blue{background:var(--blue-soft);color:var(--blue)}
+  .tile.green{background:var(--green-soft);color:var(--green)}
+  .tile.amber{background:var(--amber-soft);color:var(--amber)}
+  .tile.red{background:var(--red-soft);color:var(--red)}
+  .tile.purple{background:var(--purple-soft);color:var(--purple)}
+
+  .tile.big{
+    grid-column:1;
+    grid-row:1 / span 3;
+    justify-content:space-between;
+    padding:11px 11px 9px;
+    background:var(--green-soft);
+    color:var(--green);
+  }
+
+  .tile.big .big-top{display:flex;align-items:center;gap:6px}
+  .tile.big .coin{
+    width:20px;
+    height:20px;
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    background:#fff;
+    color:var(--green);
+    box-shadow:0 0 0 1px rgba(15,122,77,.12);
+  }
+
+  .tile.big .coin svg{width:12px;height:12px}
+  .tile.big .t-k{color:#3f7f62;font-size:9.5px}
+
+  .tile.big .big-num{
+    display:flex;
+    align-items:baseline;
+    gap:3px;
+    font-size:26px;
+    line-height:1.05;
+    font-weight:600;
+    letter-spacing:-.03em;
+    font-variant-numeric:tabular-nums;
+  }
+
+  .tile.big .big-num small{font-size:10px;font-weight:500;letter-spacing:0;opacity:.75}
+  .tile.big .big-sub{font-size:9px;color:#5a8874;line-height:1.35}
+
+  .mosaic-foot{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    margin-top:10px;
+    font-size:9.5px;
+    color:var(--muted);
+    white-space:nowrap;
+  }
+
+  .verified{
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    height:20px;
+    padding:0 7px;
+    border:1px solid var(--line);
+    border-radius:999px;
+    background:#fff;
+    color:var(--ink-2);
+    font-size:9.5px;
+  }
+
+  .verified i{width:5px;height:5px;border-radius:50%;background:var(--green)}
+
+  /* Ranking */
+  .seg{
+    display:inline-flex;
+    gap:2px;
+    padding:2px;
+    border:1px solid var(--line);
+    border-radius:7px;
+    background:#f7f8fa;
+    flex:0 0 auto;
+  }
+
+  .seg-btn{
+    height:22px;
+    padding:0 8px;
+    border:0;
+    border-radius:5px;
+    background:transparent;
+    color:var(--muted);
+    font-size:10px;
+    font-weight:500;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+
+  .seg-btn.is-active{background:#fff;color:var(--ink);box-shadow:0 1px 1px rgba(16,24,40,.05)}
+  .seg-btn:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+
+  .rank-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:11.5px;
+    table-layout:fixed;
+  }
+
+  .rank-table th{
+    padding:0 0 6px;
+    font-size:9.5px;
+    font-weight:500;
+    color:var(--muted-2);
+    text-align:left;
+    border-bottom:1px solid var(--line-soft);
+  }
+
+  .rank-table td{
+    padding:7px 0;
+    border-bottom:1px solid var(--line-soft);
+    vertical-align:middle;
+    font-variant-numeric:tabular-nums;
+  }
+
+  .rank-table tr:last-child td{border-bottom:0}
+
+  .rank-table th:nth-child(1),.rank-table td:nth-child(1){width:18px}
+  .rank-table th:nth-child(3),.rank-table td:nth-child(3){width:62px;text-align:right}
+  .rank-table th:nth-child(4),.rank-table td:nth-child(4){width:38px;text-align:right}
+
+  .rank-no{color:var(--muted-2);font-size:10px}
+
+  .rank-name{display:flex;align-items:center;gap:6px;min-width:0}
+  .rank-avatar{
+    width:18px;
+    height:18px;
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    background:var(--blue-soft);
+    color:var(--blue);
+    font-size:8.5px;
+    font-weight:600;
+    flex:0 0 auto;
+  }
+  .rank-avatar.cold{background:var(--purple-soft);color:var(--purple)}
+  .rank-name a{
+    color:var(--ink-2);
+    font-weight:500;
+    text-decoration:none;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .rank-name a:hover{color:var(--blue)}
+  .rank-name span{color:var(--muted-2);font-size:9.5px;flex:0 0 auto}
+
+  .rank-amt{font-weight:500;color:var(--ink);white-space:nowrap}
+
+  .rank-status{
+    display:inline-flex;
+    align-items:center;
+    gap:3px;
+    font-size:9.5px;
+    white-space:nowrap;
+  }
+  .rank-status::before{content:"";width:4px;height:4px;border-radius:50%;background:currentColor}
+  .rank-status.full{color:var(--green)}
+  .rank-status.partial{color:var(--amber)}
+  .rank-status.none{color:var(--red)}
+
+  .panel-foot{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    margin-top:9px;
+    font-size:9.5px;
+    color:var(--muted);
+    white-space:nowrap;
+  }
+
+  .panel-foot a{color:var(--muted);text-decoration:none}
+  .panel-foot a:hover{color:var(--ink-2)}
+
+  /* Notes */
+  .notes{padding:0;overflow:hidden}
+
+  .notes summary{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:13px 16px;
+    list-style:none;
+    font-size:12px;
+    font-weight:600;
+    cursor:pointer;
+    color:var(--ink-2);
+  }
+
+  .notes summary::-webkit-details-marker{display:none}
+  .notes summary:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+
+  .notes summary .chev{transition:transform .18s ease;color:var(--muted)}
+  .notes[open] summary .chev{transform:rotate(180deg)}
+
+  .notes-body{
+    padding:0 16px 14px;
+    border-top:1px solid var(--line-soft);
+    font-size:10.5px;
+    line-height:1.7;
+    color:var(--muted);
+  }
+
+  .notes-body p{margin:9px 0 0}
+  .notes-body strong{color:var(--ink-2);font-weight:600}
+
+  .note-links{display:flex;flex-wrap:wrap;gap:5px 12px;margin-top:9px}
+  .note-links a{color:var(--ink-2);text-decoration:none;border-bottom:1px solid var(--line)}
+  .note-links a:hover{border-bottom-color:var(--line-strong)}
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 1180px){
+    .app{grid-template-columns:220px minmax(0,1fr)}
+    .rail-left{position:static}
+    .rail-right{grid-column:1 / -1;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+    .notes{grid-column:1 / -1}
+  }
+
+  @media (max-width: 860px){
+    .app{grid-template-columns:1fr;padding:12px}
+    .channel-panel{padding:12px}
+    .channel-nav{display:flex;flex-wrap:wrap;gap:4px}
+    .group-label{display:none}
+    .channel{
+      width:auto;
+      min-height:30px;
+      padding:4px 8px;
+      border:1px solid var(--line);
+      border-radius:7px;
+      background:#fff;
+    }
+    .channel.is-active{background:#f0f2f4;border-color:#e3e5e8}
+    .ch-ic{width:18px;height:18px}
+    .side-head{padding-bottom:8px}
+    .side-foot{display:none}
+    .rail-right{grid-template-columns:1fr}
+    .notes{grid-column:auto}
+    .feed-title{font-size:18px}
+  }
+
+  @media (max-width: 560px){
+    .app{padding:10px;gap:10px}
+    .feed-top{padding:13px 14px 10px}
+    .feed-title{font-size:17px}
+    .feed-tools{padding:8px 14px 9px}
+    .feed-meta{width:100%;justify-content:flex-start}
+    .year-head{padding:9px 14px}
+    .feed-item{grid-template-columns:56px minmax(0,1fr);gap:8px;padding:12px 14px 13px}
+    .feed-time{font-size:9.5px}
+    .line{grid-template-columns:30px minmax(0,1fr);gap:6px;font-size:11.5px}
+    .line .k{font-size:10px}
+    .item-title{font-size:13px}
+    .status{margin-left:0}
+    .summary,.ranking{padding:12px 14px 10px}
+    .big-num{font-size:23px !important}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto}
+    .feed-item,.channel,.icon-btn,.notes summary .chev{transition:none}
+  }
+
+  @media print{
+    body{background:#fff}
+    .app{display:block;max-width:none;padding:0}
+    .rail-left,.rail-right,.feed-tools,.feed-actions,.notes{display:none !important}
+    .panel{border:0;box-shadow:none;border-radius:0}
+    .feed-item{break-inside:avoid;page-break-inside:avoid}
+    .feed-title{font-size:22px}
+    .src{color:var(--ink-2)}
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-stack" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 3 3 8l9 5 9-5-9-5Z"/><path d="m3 12 9 5 9-5"/><path d="m3 16 9 5 9-5"/>
+  </symbol>
+  <symbol id="i-exchange" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+    <path d="M4 20V10m5.3 10V5m5.4 15v-7m5.3 7V8"/>
+  </symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>
+  </symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 3 5 6v6c0 4 3 7 7 9 4-2 7-5 7-9V6l-7-3Z"/><path d="m9 12 2 2 4-4"/>
+  </symbol>
+  <symbol id="i-half" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+    <circle cx="12" cy="12" r="8"/><path d="M12 4v16" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 4 3 20h18L12 4Z"/><path d="M12 10v5"/><circle cx="12" cy="18" r=".7" fill="currentColor" stroke="none"/>
+  </symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+    <circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>
+  </symbol>
+  <symbol id="i-trend" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 17 10 11l4 4 6-8"/><path d="M15 7h5v5"/>
+  </symbol>
+  <symbol id="i-print" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M7 9V4h10v5"/><rect x="4" y="9" width="16" height="8" rx="2"/><path d="M7 14h10v6H7z"/>
+  </symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m6 9 6 6 6-6"/>
+  </symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M7 17 17 7M9 7h8v8"/>
+  </symbol>
+  <symbol id="i-coin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+    <circle cx="12" cy="12" r="8"/><path d="M9 15V9l3 3 3-3v6"/>
+  </symbol>
+</svg>
+
+<div class="app">
+
+  <!-- ================= Left rail ================= -->
+  <aside class="rail-left" aria-label="频道筛选">
+    <div class="panel channel-panel">
+      <div class="side-head">
+        <h2>频道</h2>
+        <span>共 14 起</span>
+      </div>
+
+      <nav class="channel-nav" aria-label="事件筛选">
+        <button type="button" class="channel is-active" data-filter="all" aria-pressed="true">
+          <span class="ch-ic"><svg class="ic" aria-hidden="true"><use href="#i-stack"/></svg></span>
+          <span class="ch-name">全部事件</span>
+          <span class="ch-count" data-count-for="all">14</span>
+        </button>
+
+        <p class="group-label">类型</p>
+        <button type="button" class="channel" data-filter="cex" aria-pressed="false">
+          <span class="ch-ic blue"><svg class="ic" aria-hidden="true"><use href="#i-exchange"/></svg></span>
+          <span class="ch-name">交易所</span>
+          <span class="ch-count" data-count-for="cex">12</span>
+        </button>
+        <button type="button" class="channel" data-filter="cold" aria-pressed="false">
+          <span class="ch-ic purple"><svg class="ic" aria-hidden="true"><use href="#i-lock"/></svg></span>
+          <span class="ch-name">自托管冷钱包</span>
+          <span class="ch-count" data-count-for="cold">2</span>
+        </button>
+
+        <p class="group-label">赔付结果</p>
+        <button type="button" class="channel" data-filter="full" aria-pressed="false">
+          <span class="ch-ic green"><svg class="ic" aria-hidden="true"><use href="#i-shield"/></svg></span>
+          <span class="ch-name">全额兜底</span>
+          <span class="ch-count" data-count-for="full">8</span>
+        </button>
+        <button type="button" class="channel" data-filter="partial" aria-pressed="false">
+          <span class="ch-ic amber"><svg class="ic" aria-hidden="true"><use href="#i-half"/></svg></span>
+          <span class="ch-name">部分赔付</span>
+          <span class="ch-count" data-count-for="partial">4</span>
+        </button>
+        <button type="button" class="channel" data-filter="none" aria-pressed="false">
+          <span class="ch-ic red"><svg class="ic" aria-hidden="true"><use href="#i-alert"/></svg></span>
+          <span class="ch-name">无平台赔付</span>
+          <span class="ch-count" data-count-for="none">2</span>
+        </button>
+
+        <p class="group-label">时间范围</p>
+        <button type="button" class="channel" data-filter="era-early" aria-pressed="false">
+          <span class="ch-ic slate"><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg></span>
+          <span class="ch-name">2014—2020</span>
+          <span class="ch-count" data-count-for="era-early">5</span>
+        </button>
+        <button type="button" class="channel" data-filter="era-late" aria-pressed="false">
+          <span class="ch-ic blue"><svg class="ic" aria-hidden="true"><use href="#i-trend"/></svg></span>
+          <span class="ch-name">2021—2026</span>
+          <span class="ch-count" data-count-for="era-late">9</span>
+        </button>
+      </nav>
+
+      <div class="side-foot"><i></i>金额按事发时美元计价</div>
+    </div>
+  </aside>
+
+  <!-- ================= Center feed ================= -->
+  <main class="panel feed" aria-labelledby="feedTitle">
+    <header class="feed-top">
+      <div class="feed-title-wrap">
+        <h1 class="feed-title" id="feedTitle">加密被盗事件</h1>
+        <span class="verify-pill"><i></i>已核验</span>
+      </div>
+      <div class="feed-actions">
+        <button type="button" class="icon-btn" id="printBtn" aria-label="打印或导出 PDF" title="打印 / 导出 PDF">
+          <svg aria-hidden="true"><use href="#i-print"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="feed-tools">
+      <label class="source-pick">
+        来源
+        <span class="select-wrap">
+          <select id="sourceFilter" aria-label="按来源类型筛选">
+            <option value="all">全部来源</option>
+            <option value="official">官方公告</option>
+            <option value="security">安全机构</option>
+            <option value="media">媒体报道</option>
+          </select>
+          <svg aria-hidden="true"><use href="#i-chev"/></svg>
+        </span>
+      </label>
+      <div class="feed-meta">
+        <span id="resultCount" aria-live="polite">显示 14 起</span>
+        <span class="sep">·</span>
+        <span>最新 2026-10-29</span>
+      </div>
+    </div>
+
+    <div class="feed-body" id="feed">
+
+      <!-- ===== 2026 ===== -->
+      <section class="year-group" data-year="2026">
+        <div class="year-head">
+          <strong>2026 年</strong>
+          <span class="year-note">4 起事件</span>
+          <span class="year-count">4 起</span>
+        </div>
+
+        <article class="feed-item" id="event-2026-binance" data-type="cex" data-status="full" data-year="2026" data-source="official" aria-labelledby="title-2026-binance">
+          <div class="feed-time"><time datetime="2026-10-29">2026.10.29</time></div>
+          <div class="item-main">
+            <div class="item-head">
+              <span class="type-tag">交易所</span>
+              <span class="avatar" aria-hidden="true">B</span>
+              <h2 class="item-title" id="title-2026-binance">Binance <span class="record-tag">史上最大</span></h2>
+              <span class="status full">全额兜底</span>
+            </div>
+            <div class="feed-lines">
+              <p class="line"><span class="k">规模</span><span class="v"><strong>约 63 亿美元</strong> <span class="muted">· 跨 10 条链</span></span></p>
+              <p class="line"><span class="k">原因</span><span class="v">DevOps 工程师笔记本被攻破，攻击者发起未授权提现；币安称无私钥泄露；FBI 归因朝鲜。</span></p>
+              <p class="line result"><span class="k">结果</span><span class="v">承诺全额赔付（SAFU + 自有资金）；约 30 亿美元已冻结；11-01 恢复提现。</span></p>
+            </div>
+            <div class="item-foot">
+              <a class="src" href="https://www.binance.com/en/support/announcement/detail/c5a8729a97ac486d963784d96c5642d7" target="_blank" rel="noopener noreferrer">来源 · Binance <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            </div>
+          </div>
+        </article>
+
+        <article class="feed-item" id="event-2026-ledger" data-type="cold" data-status="none" data-year="2026" data-source="official" aria-labelledby="title-2026-ledger">
+          <div class="feed-time"><time datetime="2026-10-09">2026.10.09</time></div>
+          <div class="item-main">
+            <div class="item-head">
+              <span class="type-tag cold">冷钱包</span>
+              <span class="avatar cold" aria-hidden="true">L</span>
+              <h2 class="item-title" id="title-2026-ledger">Ledger · CryptoBilis</h2>
+              <span class="status none">无官方赔付</span>
+            </div>
+            <div class="feed-lines">
+              <p class="line"><span class="k">规模</span><span class="v"><strong>约 0.93–1.02 亿美元</strong> <span class="muted">· 315–335 个钱包</span></span></p>
+              <p class="line"><span class="k">原因</span><span class="v">授权经销商 CryptoBilis 环节被物理改装，初始化时截取助记词并经 LTE 外传；非固件漏洞。</span></p>
+              <p class="line result"><span class="k">结果</span><span class="v">无官方赔付方案；Ledger 配合执法并建议迁移种子；法律索赔仍在讨论。</span></p>
+            </div>
+            <div class="item-foot">
+              <a class="src" href="https://www.ledger.com/blog-response-hardware-implant-attack" target="_blank" rel="noopener noreferrer">来源 · Ledger <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            </div>
+          </div>
+        </article>
+
+        <article class="feed-item" id="event-2026-bitget" data-type="cex" data-status="full" data-year="2026" data-source="official" aria-labelledby="title-2026-bitget">
+          <div class="feed-time"><time datetime="2026-09">2026.09</time></div>
+          <div class="item-main">
+            <div class="item-head">
+              <span class="type-tag">交易所</span>
+              <span class="avatar" aria-hidden="true">B</span>
+              <h2 class="item-title" id="title-2026-bitget">Bitget</h2>
+              <span class="status full">全额兜底</span>
+            </div>
+            <div class="feed-lines">
+              <p class="line"><span class="k">规模</span><span class="v"><strong>约 3.875 亿美元</strong> <span class="muted">· 初报 3.516 亿，后上修</span></span></p>
+              <p class="line"><span class="k">原因</span><span class="v">第三方安全产品 0day 供应链攻击；热/温钱包被转出，冷钱包与 Bitget Wallet 未受影响。</span></p>
+              <p class="line result"><span class="k">结果</span><span class="v">4.64 亿美元保护基金覆盖；9/28 起分阶段恢复提现；仅冻结约 110 万美元。</span></p>
+            </div>
+            <div class="item-foot">
+              <a class="src" href="https://www.bitget.com/support/articles/12560603896024" target="_blank" rel="noopener noreferrer">来源 · Bitget <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            </div>
+          </div>
+        </article>
+
+        <article class="feed-item" id="event-2026-coldcard" data-type="cold" data-status="none" data-year="2026" data-source="official" aria-labelledby="title-2026-coldcard">
+          <div class="feed-time"><time datetime="2026-07">2026.07</time></div>
+          <div class="item-main">
+            <div class="item-head">
+              <span class="type-tag cold">冷钱包</span>
+              <span class="avatar cold" aria-hidden="true">C</span>
+              <h2 class="item-title" id="title-2026-coldcard">Coldcard</h2>
+              <span class="status none">无平台赔付</span>
+            </div>
+            <div class="feed-lines">
+              <p class="line"><span class="k">规模</span><span class="v"><strong>1,816 BTC</strong> <span class="muted">· 约 1.16 亿美元</span></span></p>
+              <p class="line"><span class="k">原因</span><span class="v">Mk3 固件 4.0.1–4.1.9 随机数缺陷，种子熵约 40 bit，攻击者可离线重建种子。</span></p>
+              <p class="line result"><span class="k">结果</span><span class="v">自托管，无平台赔付；官方建议升级固件并迁移低熵种子；法律索赔仍在讨论。</span></p>
+            </div>
+            <div class="item-foot">
+              <a class="src" href="https://blog.coinkite.com/coldcard-mk3-seed-generation-warning/" target="_blank" rel="noopener noreferrer">来源 · Coinkite <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <!-- ===== 2025 ===== -->
+      <section class="year-group" data-year="2025">
+        <div class="year-head">
+          <strong>2025 年</strong>
+          <span class="year-note">2 起事件</span>
+          <span class="year-count">2 起</span>
+        </div>
+
+        <article class="feed-item" id="event-2025-coindcx" data-type="cex" data-status="full" data-year="2025" data-source="media" aria-labelledby="title-2025-coindcx">
+          <div class="feed-time"><time datetime="2025-07">2025.07</time></div>
+          <div class="item-main">
+            <div class="item-head">
+              <span class="type-tag">交易所</span>
+              <span class="avatar" aria-hidden="true">C</span>
+              <h2 class="item-title" id="title-2025-coindcx">CoinDCX</h2>
+              <span class="status full">全额兜底</span>
+            </div>
+            <div class="feed-lines">
+              <p class="line"><span class="k">规模</span><span class="v"><strong>约 4,400 万美元</strong> <span class="muted">· 内部储备账户</span></span></p>
+              <p class="line"><span class="k">原因</span><span class="v">内部储备账户被攻破；交易所强调用户资金未受影响。</span></p>
+              <p class="line result"><span class="k">结果</span><span class="v">公司承担损失；推出追回悬赏，并加强内部账户隔离。</span></p>
+            </div>
+            <div class="item-foot">
+              <a class="src" href="https://therecord.media/indian-crypto-dcx-millions-stolen" target="_blank" rel="noopener noreferrer">来源 · The Record <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            </div>
+          </div>
+        </article>
+
+        <article class="feed-item" id="event-2025-bybit" data-type="cex" data-status="full" data-year="2025" data-source="official" aria-labelledby="title-2025-bybit">
+          <div class="feed-time"><time datetime="2025-02">2025.02</time></div>
+          <div class="item-main">
+            <div class="item-head">
+              <span class="type-tag">交易所 · 冷钱包</span>
+              <span class="avatar" aria-hidden="true">B</span>
+              <h2 class="item-title" id="title-2025-bybit">Bybit</h2>
+              <span class="status full">全额兜底</span>
+            </div>
+            <div class="feed-lines">
+              <p class="line"><span class="k">规模</span><span class="v"><strong>401,347 ETH</strong> <span class="muted">· 约 15 亿美元</span></span></p>
+              <p class="line"><span class="k">原因</span><span class="v">Safe{Wallet} 前端被注入恶意 JS，签名者看到正常界面却签署恶意交易；FBI 归因 Lazarus。</span></p>
+              <p class="line result"><span class="k">结果</span><span class="v">1:1 全额兜底；追回 4,840 万 + 冻结 3,050 万美元；10% 悬赏；起诉朝鲜。</span></p>
+            </div>
+            <div class="item-foot">
+              <a class="src" href="https://www.bybit.com/en/learn/this-week-in-bybit/bybit-security-incident-timeline" target="_blank" rel="noopener noreferrer">来源 · Bybit <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <!-- ===== 2024 ===== -->
+      <section class="year-group" data-year="2024">
+        <div class="year-head">
+          <strong>2024 年</strong>
+          <span class="year-note">2 起事件</span>
+          <span class="year-count">2 起</span>
+        </div>
+
+        <article class="feed-item" id="event-2024-wazirx" data-type="cex" data-status="partial" data-year="2024" data-source="official" aria-labelledby="title-2024-wazirx">
+          <div class="feed-time"><time datetime="2024-07">2024.07</time></div>
+          <div class="item-main">
+            <div class="item-head">
+              <span class="type-tag">交易所</span>
+              <span class="avatar" aria-hidden="true">W</span>
+              <h2 class="item-title" id="title-2024-wazirx">WazirX</h2>
+              <span class="status partial">部分赔付</span>
+            </div>
+            <div class="feed-lines">
+              <p class="line"><span class="k">规模</span><span class="v"><strong>约 2.35 亿美元</strong> <span class="muted">· 多币种资产</span></span></p>
+              <p class="line"><span class="k">原因</span><span class="v">Liminal 多签钱包被攻破，攻击者替换交易载荷，绕过签名者确认。</span></p>
+              <p class="line result"><span class="k">结果</span><span class="v">新加坡法院批准重组；首期约 85% + 15% Recovery Token（2026-01 发放）。</span></p>
+            </div>
+            <div class="item-foot">
+              <a class="src" href="https://wazirx.com/blog/recovery-tokens-explained/" target="_blank" rel="noopener noreferrer">来源 · WazirX <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            </div>
+          </div>
+        </article>
+
+        <article class="feed-item" id="event-2024-dmm" data-type="cex" data-status="full" data-year="2024" data-source="security" aria-labelledby="title-2024-dmm">
+          <div class="feed-time"><time datetime="2024-05">2024.05</time></div>
+          <div class="item-main">
+            <div class="item-head">
+              <span class="type-tag">交易所</span>
+              <span class="avatar" aria-hidden="true">D</span>
+              <h2 class="item-title" id="title-2024-dmm">DMM Bitcoin</h2>
+              <span class="status full">全额兜底</span>
+            </div>
+            <div class="feed-lines">
+              <p class="line"><span class="k">规模</span><span class="v"><strong>4,502.9 BTC</strong> <span class="muted">· 约 3.05 亿美元</span></span></p>
+              <p class="line"><span class="k">原因</span><span class="v">私钥/签名权限被社工窃取；FBI 与日本警方将攻击归因于朝鲜 TraderTraitor。</span></p>
+              <p class="line result"><span class="k">结果</span><span class="v">集团资金全额补足客户 BTC 存款；2025-03 账户与资产移交 SBI VC Trade，交易所关闭。</span></p>
+            </div>
+            <div class="item-foot">
+              <a class="src" href="https://www.fbi.gov/news/press-releases/fbi-dc3-and-npa-identification-of-north-korean-cyber-actors-tracked-as-tradertraitor-responsible-for-theft-of-308-million-from-bitcoindmmcom" target="_blank" rel="noopener noreferrer">来源 · FBI <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <!-- ===== 2021 ===== -->
+      <section class="year-group" data-year="2021">
+        <div class="year-head">
+          <strong>2021 年</strong>
+          <span class="year-note">1 起事件</span>
+          <span class="year-count">1 起</span>
+        </div>
+
+        <article class="feed-item" id="event-2021-bitmart" data-type="cex" data-status="full" data-year="2021" data-source="media" aria-labelledby="title-2021-bitmart">
+          <div class="feed-time"><time datetime="2021-12">2021.12</time></div>
+          <div class="item-main">
+            <div class="item-head">
+              <span class="type-tag">交易所</span>
+              <span class="avatar" aria-hidden="true">B</span>
+              <h2 class="item-title" id="title-2021-bitmart">BitMart</h2>
+              <span class="status full">全额兜底</span>
+            </div>
+            <div class="feed-lines">
+              <p class="line"><span class="k">规模</span><span class="v"><strong>约 1.96 亿美元</strong> <span class="muted">· ETH / BSC 热钱包</span></span></p>
+              <p class="line"><span class="k">原因</span><span class="v">ETH 与 BSC 热钱包私钥被盗，攻击者通过混币器/跨链转移资金。</span></p>
+              <p class="line result"><span class="k">结果</span><span class="v">使用自有储备全额赔付受影响用户，随后恢复交易与提现。</span></p>
+            </div>
+            <div class="item-foot">
+              <a class="src" href="https://www.cnbc.com/2021/12/05/hackers-take-196-million-from-crypto-exchange-bitmart-in-large-breach.html" target="_blank" rel="noopener noreferrer">来源 · CNBC <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <!-- ===== 2020 ===== -->
+      <section class="year-group" data-year="2020">
+        <div class="year-head">
+          <strong>2020 年</strong>
+          <span class="year-note">1 起事件</span>
+          <span class="year-count">1 起</span>
+        </div>
+
+        <article class="feed-item" id="event-2020-kucoin" data-type="cex" data-status="full" data-year="2020" data-source="security" aria-labelledby="title-2020-kucoin">
+          <div class="feed-time"><time datetime="2020-09">2020.09</time></div>
+          <div class="item-main">
+            <div class="item-head">
+              <span class="type-tag">交易所</span>
+              <span class="avatar" aria-hidden="true">K</span>
+              <h2 class="item-title" id="title-2020-kucoin">KuCoin</h2>
+              <span class="status full">全额兜底</span>
+            </div>
+            <div class="feed-lines">
+              <p class="line"><span class="k">规模</span><span class="v"><strong>约 2.81 亿美元</strong> <span class="muted">· 多币种热钱包</span></span></p>
+              <p class="line"><span class="k">原因</span><span class="v">热钱包私钥泄露，攻击者迅速在去中心化交易所洗币，并波及多个项目代币。</span></p>
+              <p class="line result"><span class="k">结果</span><span class="v">追回约 84%；其余由保险基金/平台承担，用户资产恢复，平台随后恢复提现。</span></p>
+            </div>
+            <div class="item-foot">
+              <a class="src" href="https://www.chainalysis.com/blog/kucoin-hack-2020-defi-uniswap/" target="_blank" rel="noopener noreferrer">来源 · Chainalysis <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <!-- ===== 2019 ===== -->
+      <section class="year-group" data-year="2019">
+        <div class="year-head">
+          <strong>2019 年</strong>
+          <span class="year-note">1 起事件</span>
+          <span class="year-count">1 起</span>
+        </div>
+
+        <article class="feed-item" id="event-2019-binance" data-type="cex" data-status="full" data-year="2019" data-source="official" aria-labelledby="title-2019-binance">
+          <div class="feed-time"><time datetime="2019-05">2019.05</time></div>
+          <div class="item-main">
+            <div class="item-head">
+              <span class="type-tag">交易所</span>
+              <span class="avatar" aria-hidden="true">B</span>
+              <h2 class="item-title" id="title-2019-binance">Binance</h2>
+              <span class="status full">全额兜底</span>
+            </div>
+            <div class="feed-lines">
+              <p class="line"><span class="k">规模</span><span class="v"><strong>7,000 BTC</strong> <span class="muted">· 约 4,000 万美元</span></span></p>
+              <p class="line"><span class="k">原因</span><span class="v">攻击者通过钓鱼/病毒获取 API 密钥、2FA 与提现权限，从热钱包转走 7,000 BTC。</span></p>
+              <p class="line result"><span class="k">结果</span><span class="v">SAFU 全额赔付，用户资产未受损失；币安随后重置 API 密钥并加强风控。</span></p>
+            </div>
+            <div class="item-foot">
+              <a class="src" href="https://www.binance.com/en/support/announcement/detail/360028031711" target="_blank" rel="noopener noreferrer">来源 · Binance <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <!-- ===== 2018 ===== -->
+      <section class="year-group" data-year="2018">
+        <div class="year-head">
+          <strong>2018 年</strong>
+          <span class="year-note">1 起事件</span>
+          <span class="year-count">1 起</span>
+        </div>
+
+        <article class="feed-item" id="event-2018-coincheck" data-type="cex" data-status="partial" data-year="2018" data-source="media" aria-labelledby="title-2018-coincheck">
+          <div class="feed-time"><time datetime="2018-01">2018.01</time></div>
+          <div class="item-main">
+            <div class="item-head">
+              <span class="type-tag">交易所</span>
+              <span class="avatar" aria-hidden="true">C</span>
+              <h2 class="item-title" id="title-2018-coincheck">Coincheck</h2>
+              <span class="status partial">约 90% 赔付</span>
+            </div>
+            <div class="feed-lines">
+              <p class="line"><span class="k">规模</span><span class="v"><strong>5.23 亿 NEM</strong> <span class="muted">· 约 5.34 亿美元</span></span></p>
+              <p class="line"><span class="k">原因</span><span class="v">NEM 热钱包私钥存储在联网服务器，未使用多签；攻击者直接转走约 5.23 亿 NEM。</span></p>
+              <p class="line result"><span class="k">结果</span><span class="v">自有资金赔付约 463 亿日元，覆盖约 90%；公司后续被 Monex 收购。</span></p>
+            </div>
+            <div class="item-foot">
+              <a class="src" href="https://www.bbc.com/news/world-asia-42850194" target="_blank" rel="noopener noreferrer">来源 · BBC <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <!-- ===== 2016 ===== -->
+      <section class="year-group" data-year="2016">
+        <div class="year-head">
+          <strong>2016 年</strong>
+          <span class="year-note">1 起事件</span>
+          <span class="year-count">1 起</span>
+        </div>
+
+        <article class="feed-item" id="event-2016-bitfinex" data-type="cex" data-status="partial" data-year="2016" data-source="security" aria-labelledby="title-2016-bitfinex">
+          <div class="feed-time"><time datetime="2016-08">2016.08</time></div>
+          <div class="item-main">
+            <div class="item-head">
+              <span class="type-tag">交易所</span>
+              <span class="avatar" aria-hidden="true">B</span>
+              <h2 class="item-title" id="title-2016-bitfinex">Bitfinex</h2>
+              <span class="status partial">部分赔付</span>
+            </div>
+            <div class="feed-lines">
+              <p class="line"><span class="k">规模</span><span class="v"><strong>119,756 BTC</strong> <span class="muted">· 约 7,200 万美元</span></span></p>
+              <p class="line"><span class="k">原因</span><span class="v">多签/API 安全漏洞；具体攻击向量未完全公开，攻击者迅速拆分并转移约 12 万 BTC。</span></p>
+              <p class="line result"><span class="k">结果</span><span class="v">36% 社会化损失，发放 BFX 代币，2017 年全部回购；2022 年美司法部追回 94,636 BTC。</span></p>
+            </div>
+            <div class="item-foot">
+              <a class="src" href="https://www.chainalysis.com/blog/bitfinex-hack-seizure-arrest-2022/" target="_blank" rel="noopener noreferrer">来源 · Chainalysis <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <!-- ===== 2014 ===== -->
+      <section class="year-group" data-year="2014">
+        <div class="year-head">
+          <strong>2014 年</strong>
+          <span class="year-note">1 起事件</span>
+          <span class="year-count">1 起</span>
+        </div>
+
+        <article class="feed-item" id="event-2014-mtgox" data-type="cex" data-status="partial" data-year="2014" data-source="media" aria-labelledby="title-2014-mtgox">
+          <div class="feed-time"><time datetime="2014-02">2014.02</time></div>
+          <div class="item-main">
+            <div class="item-head">
+              <span class="type-tag">交易所</span>
+              <span class="avatar" aria-hidden="true">M</span>
+              <h2 class="item-title" id="title-2014-mtgox">Mt. Gox</h2>
+              <span class="status partial">部分 / 长期</span>
+            </div>
+            <div class="feed-lines">
+              <p class="line"><span class="k">规模</span><span class="v"><strong>85 万 BTC</strong> <span class="muted">· 约 4.5 亿美元 · 后找回约 20 万 BTC</span></span></p>
+              <p class="line"><span class="k">原因</span><span class="v">热钱包与系统长期漏洞、私钥管理混乱；破产清算过程中发现约 20 万 BTC。</span></p>
+              <p class="line result"><span class="k">结果</span><span class="v">破产清算；2024-07 起部分 BTC/BCH 赔付；截至 2026-10，截止日再次延至 2027-10-31。</span></p>
+            </div>
+            <div class="item-foot">
+              <a class="src" href="https://cryptoslate.com/mt-gox-creditors-face-another-year-of-waiting-as-repayment-deadline-slips-to-2027/" target="_blank" rel="noopener noreferrer">来源 · CryptoSlate <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            </div>
+          </div>
+        </article>
+      </section>
+
+    </div>
+
+    <div class="empty" id="emptyState" hidden>
+      <strong>没有匹配的事件</strong>
+      <span>换一个频道或来源试试。</span>
+    </div>
+  </main>
+
+  <!-- ================= Right rail ================= -->
+  <aside class="rail-right" aria-label="概览与排行榜">
+
+    <section class="panel summary" aria-labelledby="summaryTitle">
+      <div class="panel-head">
+        <h2 id="summaryTitle">概览</h2>
+        <a class="panel-link" href="#notes">数据说明 →</a>
+      </div>
+
+      <div class="market-stats">
+        <div class="market-stat">
+          <span class="k">累计影响（估算）</span>
+          <strong>≈$10.6B</strong>
+          <small>按事发时美元粗略加总</small>
+        </div>
+        <div class="market-stat">
+          <span class="k">最大单案占比</span>
+          <strong>60%</strong>
+          <small>Binance 2026 · $6.3B</small>
+        </div>
+      </div>
+
+      <div class="mosaic" aria-label="事件结构矩阵">
+        <div class="tile big">
+          <div class="big-top">
+            <span class="coin"><svg aria-hidden="true"><use href="#i-coin"/></svg></span>
+            <span class="t-k">重大事件</span>
+          </div>
+          <div class="big-num">14 <small>起</small></div>
+          <span class="big-sub">覆盖 9 个年份 · 2014—2026</span>
+        </div>
+        <div class="tile blue"><span class="t-k">交易所</span><strong>12<small>起</small></strong></div>
+        <div class="tile purple"><span class="t-k">自托管冷钱包</span><strong>2<small>起</small></strong></div>
+        <div class="tile green"><span class="t-k">全额兜底</span><strong>8<small>起</small></strong></div>
+        <div class="tile amber"><span class="t-k">部分赔付</span><strong>4<small>起</small></strong></div>
+        <div class="tile red"><span class="t-k">无赔付</span><strong>2<small>起</small></strong></div>
+        <div class="tile"><span class="t-k">最大单案</span><strong>$6.3B</strong></div>
+      </div>
+
+      <div class="mosaic-foot">
+        <span>按事发时计价 · 含估算值</span>
+        <span class="verified"><i></i>已核验</span>
+      </div>
+    </section>
+
+    <section class="panel ranking" aria-labelledby="rankTitle">
+      <div class="panel-head">
+        <h2 id="rankTitle">排行榜</h2>
+        <div class="seg" role="group" aria-label="排行榜视图">
+          <button type="button" class="seg-btn is-active" data-rank="size" aria-pressed="true">规模榜</button>
+          <button type="button" class="seg-btn" data-rank="latest" aria-pressed="false">最新</button>
+        </div>
+      </div>
+
+      <table class="rank-table">
+        <thead>
+          <tr><th scope="col">#</th><th scope="col">事件</th><th scope="col">金额</th><th scope="col">结果</th></tr>
+        </thead>
+        <tbody id="rankBody"></tbody>
+      </table>
+
+      <div class="panel-foot">
+        <span>按事发时美元估算</span>
+        <a href="#event-2026-binance">查看事件 →</a>
+      </div>
+    </section>
+
+    <details class="panel notes" id="notes">
+      <summary>
+        <span>数据口径与来源</span>
+        <svg class="chev ic" aria-hidden="true"><use href="#i-chev"/></svg>
+      </summary>
+      <div class="notes-body">
+        <p><strong>金额口径：</strong>除特别注明外，均按事件发生时的美元价格计价；累计影响为各事件金额的粗略加总，含估算值。</p>
+        <p><strong>损失口径：</strong>“影响金额”不等于净损失，“全额兜底”也不等于全额追回；平台自有资金与链上追回是两件事。</p>
+        <p><strong>归因口径：</strong>朝鲜相关归因以 FBI、Chainalysis、TRM 等公开报告为准；Bitget 官方确认的是第三方 0day。</p>
+        <p><strong>分类口径：</strong>“交易所 / 自托管冷钱包”按平台类型划分。Bybit 属交易所，2025-02 失窃的是其交易所冷钱包，因此计入“交易所”；“自托管冷钱包”仅指 Ledger、Coldcard 等用户自行保管的硬件设备。</p>
+        <div class="note-links">
+          <a href="https://rekt.news/leaderboard/" target="_blank" rel="noopener noreferrer">Rekt Leaderboard</a>
+          <a href="https://www.chainalysis.com/blog/crypto-hacking-stolen-funds-2026/" target="_blank" rel="noopener noreferrer">Chainalysis</a>
+          <a href="https://www.trmlabs.com/resources/blog/north-korea-steals-usd-6-36-billion-from-binance-in-the-largest-hack-in-history" target="_blank" rel="noopener noreferrer">TRM Labs</a>
+          <a href="https://www.fbi.gov/investigate/cyber/alerts/2026/north-korea-responsible-for-6-billion-binance-attack" target="_blank" rel="noopener noreferrer">FBI · 2026</a>
+          <a href="https://www.fbi.gov/investigate/cyber/alerts/2025/north-korea-responsible-for-1-5-billion-bybit-hack" target="_blank" rel="noopener noreferrer">FBI · 2025</a>
+        </div>
+      </div>
+    </details>
+
+  </aside>
+</div>
+
+<script>
+(function () {
+  var feed = document.getElementById('feed');
+  var events = Array.prototype.slice.call(feed.querySelectorAll('.feed-item'));
+  var yearGroups = Array.prototype.slice.call(feed.querySelectorAll('.year-group'));
+  var channels = Array.prototype.slice.call(document.querySelectorAll('.channel'));
+  var countEls = Array.prototype.slice.call(document.querySelectorAll('[data-count-for]'));
+  var countFor = {};
+  countEls.forEach(function (el) { countFor[el.getAttribute('data-count-for')] = el; });
+  var resultCount = document.getElementById('resultCount');
+  var emptyState = document.getElementById('emptyState');
+  var sourceSelect = document.getElementById('sourceFilter');
+  var state = { filter: 'all', source: 'all' };
+
+  function matchesFilter(el, filter) {
+    var year = parseInt(el.getAttribute('data-year'), 10);
+    if (filter === 'all') return true;
+    if (filter === 'cex' || filter === 'cold') return el.getAttribute('data-type') === filter;
+    if (filter === 'full' || filter === 'partial' || filter === 'none') return el.getAttribute('data-status') === filter;
+    if (filter === 'era-early') return year <= 2020;
+    if (filter === 'era-late') return year >= 2021;
+    return true;
+  }
+
+  function matchesSource(el) {
+    return state.source === 'all' || el.getAttribute('data-source') === state.source;
+  }
+
+  function update() {
+    var visible = 0;
+
+    events.forEach(function (el) {
+      var show = matchesFilter(el, state.filter) && matchesSource(el);
+      el.classList.toggle('is-hidden', !show);
+      if (show) visible += 1;
+    });
+
+    yearGroups.forEach(function (group) {
+      var shown = group.querySelectorAll('.feed-item:not(.is-hidden)').length;
+      group.classList.toggle('is-hidden', shown === 0);
+      var count = group.querySelector('.year-count');
+      if (count) count.textContent = shown + ' 起';
+      var note = group.querySelector('.year-note');
+      if (note) note.textContent = shown + ' 起事件';
+    });
+
+    Object.keys(countFor).forEach(function (filter) {
+      var n = events.filter(function (el) {
+        return matchesFilter(el, filter) && matchesSource(el);
+      }).length;
+      countFor[filter].textContent = n;
+    });
+
+    resultCount.textContent = '显示 ' + visible + ' 起';
+    emptyState.hidden = visible !== 0;
+  }
+
+  channels.forEach(function (button) {
+    button.addEventListener('click', function () {
+      state.filter = button.getAttribute('data-filter');
+      channels.forEach(function (other) {
+        var active = other === button;
+        other.classList.toggle('is-active', active);
+        other.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+      update();
+    });
+  });
+
+  sourceSelect.addEventListener('change', function () {
+    state.source = sourceSelect.value;
+    update();
+  });
+
+  var RANKS = [
+    { id: 'event-2026-binance', name: 'Binance', year: '2026', date: '2026-10-29', usd: 6.3, label: '$6.3B', status: 'full' },
+    { id: 'event-2026-ledger', name: 'Ledger', year: '2026', date: '2026-10-09', usd: 0.98, label: '$0.98B', status: 'none' },
+    { id: 'event-2026-bitget', name: 'Bitget', year: '2026', date: '2026-09', usd: 0.3875, label: '$387.5M', status: 'full' },
+    { id: 'event-2026-coldcard', name: 'Coldcard', year: '2026', date: '2026-07', usd: 0.116, label: '$116M', status: 'none' },
+    { id: 'event-2025-coindcx', name: 'CoinDCX', year: '2025', date: '2025-07', usd: 0.044, label: '$44M', status: 'full' },
+    { id: 'event-2025-bybit', name: 'Bybit', year: '2025', date: '2025-02', usd: 1.5, label: '$1.5B', status: 'full' },
+    { id: 'event-2024-wazirx', name: 'WazirX', year: '2024', date: '2024-07', usd: 0.235, label: '$235M', status: 'partial' },
+    { id: 'event-2024-dmm', name: 'DMM Bitcoin', year: '2024', date: '2024-05', usd: 0.305, label: '$305M', status: 'full' },
+    { id: 'event-2021-bitmart', name: 'BitMart', year: '2021', date: '2021-12', usd: 0.196, label: '$196M', status: 'full' },
+    { id: 'event-2020-kucoin', name: 'KuCoin', year: '2020', date: '2020-09', usd: 0.281, label: '$281M', status: 'full' },
+    { id: 'event-2019-binance', name: 'Binance', year: '2019', date: '2019-05', usd: 0.04, label: '$40M', status: 'full' },
+    { id: 'event-2018-coincheck', name: 'Coincheck', year: '2018', date: '2018-01', usd: 0.534, label: '$534M', status: 'partial' },
+    { id: 'event-2016-bitfinex', name: 'Bitfinex', year: '2016', date: '2016-08', usd: 0.072, label: '$72M', status: 'partial' },
+    { id: 'event-2014-mtgox', name: 'Mt. Gox', year: '2014', date: '2014-02', usd: 0.45, label: '$450M', status: 'partial' }
+  ];
+
+  var STATUS_TEXT = { full: '全额', partial: '部分', none: '无' };
+  var COLD = { 'event-2026-ledger': true, 'event-2026-coldcard': true };
+  var rankBody = document.getElementById('rankBody');
+  var rankButtons = Array.prototype.slice.call(document.querySelectorAll('.seg-btn'));
+
+  function renderRank(mode) {
+    var list = RANKS.slice().sort(mode === 'size'
+      ? function (a, b) { return b.usd - a.usd; }
+      : function (a, b) { return b.date.localeCompare(a.date); }
+    ).slice(0, 6);
+
+    rankBody.innerHTML = list.map(function (item, index) {
+      return '<tr>' +
+        '<td class="rank-no">' + (index + 1) + '</td>' +
+        '<td><span class="rank-name"><span class="rank-avatar' + (COLD[item.id] ? ' cold' : '') + '" aria-hidden="true">' + item.name.charAt(0) + '</span><a href="#' + item.id + '">' + item.name + '</a><span>' + item.year + '</span></span></td>' +
+        '<td class="rank-amt">' + item.label + '</td>' +
+        '<td><span class="rank-status ' + item.status + '">' + STATUS_TEXT[item.status] + '</span></td>' +
+        '</tr>';
+    }).join('');
+  }
+
+  rankButtons.forEach(function (button) {
+    button.addEventListener('click', function () {
+      rankButtons.forEach(function (other) {
+        var active = other === button;
+        other.classList.toggle('is-active', active);
+        other.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+      renderRank(button.getAttribute('data-rank'));
+    });
+  });
+
+  rankBody.addEventListener('click', function (ev) {
+    var link = ev.target.closest('a[href^="#"]');
+    if (!link) return;
+    var target = document.querySelector(link.getAttribute('href'));
+    if (!target) return;
+    ev.preventDefault();
+
+    if (target.classList.contains('is-hidden')) {
+      state.filter = 'all';
+      state.source = 'all';
+      sourceSelect.value = 'all';
+      channels.forEach(function (button) {
+        var active = button.getAttribute('data-filter') === 'all';
+        button.classList.toggle('is-active', active);
+        button.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+      update();
+    }
+
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
+    target.classList.add('is-flash');
+    setTimeout(function () { target.classList.remove('is-flash'); }, 1600);
+  });
+
+  document.getElementById('printBtn').addEventListener('click', function () {
+    window.print();
+  });
+
+  document.querySelectorAll('a[href="#notes"]').forEach(function (link) {
+    link.addEventListener('click', function () {
+      document.getElementById('notes').open = true;
+    });
+  });
+
+  renderRank('size');
+  update();
+})();
+</script>
+</body>
+</html>
